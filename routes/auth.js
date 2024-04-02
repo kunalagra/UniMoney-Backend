@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
     try {
         // Find user by email in MongoDB
-        const user = await User.findOne({ email: req.user.email });
+        const user = await User.findOne({ _id: req.user._id });
 
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
