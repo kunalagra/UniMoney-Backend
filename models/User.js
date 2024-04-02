@@ -5,14 +5,7 @@ const userSchema = new mongoose.Schema({
     username: String,
     email: String,
     password: String,
-    gender: String,
-    age: String,
-    goals: [String],
-    goalsProgress: [String],
-    categories: [String], 
-    categoriesLimits : [Number],
+    userInfo: { type: Schema.Types.ObjectId, ref: 'UserInfo', }
     });
 
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);;
