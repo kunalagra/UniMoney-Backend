@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const transactionSchema = new mongoose.Schema({
     amount: Number,
     acc: Number,
-    date: Date,
+    date: {type: Date, default: Date.now },
     categories: [{type: Schema.Types.ObjectId, ref: 'Category'}],
     type: { type: String, enum: ['debit', 'credit'], default: 'debit' },
     txid: Number,
@@ -12,5 +12,5 @@ const transactionSchema = new mongoose.Schema({
     name: String,
 });
 
-
+transactionSchema.index({ date: 1 });
 module.exports = mongoose.model('Transaction', transactionSchema);
