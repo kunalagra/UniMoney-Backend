@@ -6,7 +6,7 @@ const UserInfo = require('../models/UserInfo');
 
 
 router.get('/', authenticateToken, async (req, res) => {
-    const uid = req.user._id
+    const uid = req.user
     console.log(uid)
     const userInfo = await UserInfo.findById({ _id: uid });
     try {
