@@ -105,10 +105,10 @@ router.post('/register', async (req, res) => {
                 if (!category) {
                     const newCategory = new Category(defaultCategories[i]);
                     const category = await newCategory.save();
-                    newUserInfo.categories.push({details: category._id});
+                    newUserInfo.category.push({details: category._id});
                 }
                 else{
-                newUserInfo.categories.push({details: category._id});
+                    newUserInfo.category.push({details: category._id});
                 }
             }
             for (let i=0; i<data.transaction.length; i++){

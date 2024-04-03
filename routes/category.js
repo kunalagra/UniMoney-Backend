@@ -20,7 +20,7 @@ const upload = multer({ storage: storage });
 router.get('/', authenticateToken, async (req, res) => {
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const categories = await Category.find({ _id: { $in: userInfo.categories.map((category) => category.details) } });
+        const categories = await Category.find({ _id: { $in: userInfo.category.map((category) => category.details) } });
         
         res.json(categories);
     } catch (error) {
@@ -48,7 +48,7 @@ router.post('/', upload.single('img'), authenticateToken, async (req, res) => {
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const newCategory = await Category.create({ name, img: file.path });
-        userInfo.categories.push({ details: newCategory._id });
+        userInfo.category.push({ details: newCategory._id });
         await userInfo.save();
         res.status(201).json(newCategory);
     } catch (error) {
