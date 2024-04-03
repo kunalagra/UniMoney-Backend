@@ -96,7 +96,10 @@ router.post('/register', async (req, res) => {
 
         } else {
             // Create new user
-            const newUserInfo = new UserInfo(data.userInfo);
+
+            const newUser = await User.create(data);
+            data.userInfo._id = newUser._id;
+            const newUserInfo = UserInfo.create(data.userInfo);
             for (let i=0; i<defaultCategories.length; i++){
                 const category = await Category.findOne({ name: defaultCategories[i].name });
                 if (!category) {
@@ -113,9 +116,7 @@ router.post('/register', async (req, res) => {
                 const transaction = await newTransaction.save();
                 newUserInfo.transaction.push(transaction._id);
             }
-            const userInfo = await newUserInfo.save();
-            data.userInfo = userInfo._id;
-            const newUser = await User.create(data);
+            await newUserInfo.save();
 
             res.status(201).json({ message: 'User registered successfully.', userId: newUser._id.toString() });
         }

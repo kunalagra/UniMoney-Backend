@@ -10,9 +10,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 router.post('/', authenticateToken, async (req, res) => {
     const dataList = req.body.List;
     const transactionList = [];
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         for (let i = 0; i < dataList.length; i++) {
             const data = dataList[i];
@@ -35,9 +33,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
 // Get all transactions
 router.get('/', authenticateToken, async (req, res) => {
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } });
         res.json(transactions);
@@ -49,9 +45,7 @@ router.get('/', authenticateToken, async (req, res) => {
 
 // get transactions by month but transaction as type date
 router.get('/month/:month', authenticateToken, async (req, res) => {
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } });
         const month = parseInt(req.params.month);

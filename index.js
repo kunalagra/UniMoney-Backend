@@ -9,6 +9,7 @@ const auth = require('./routes/auth');
 const category = require('./routes/category');
 const path = require('path');
 const transaction = require('./routes/transaction');
+const bank = require('./routes/bank');
 
 app.use(express.json({limit: '25mb'}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -25,6 +26,7 @@ app.get("/free", (req, res) => {
 });
 app.use('/category', category);
 app.use('/transaction', transaction);
+app.use('/bank', bank);
 
 
 app.listen(port, () => {

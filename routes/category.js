@@ -18,9 +18,7 @@ const upload = multer({ storage: storage });
 
 // Get all categories
 router.get('/', authenticateToken, async (req, res) => {
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const categories = await Category.find({ _id: { $in: userInfo.categories.map((category) => category.details) } });
         
@@ -47,9 +45,7 @@ router.post('/', upload.single('img'), authenticateToken, async (req, res) => {
     const file = req.file;
     // console.log(file);
     const name = req.body.name;
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const newCategory = await Category.create({ name, img: file.path });
         userInfo.categories.push({ details: newCategory._id });
@@ -69,9 +65,7 @@ router.post('/', upload.single('img'), authenticateToken, async (req, res) => {
 // Update a category and its limit by ID
 router.put('/:id', authenticateToken, async (req, res) => {
     data = req.body;
-    const userId = req.user._id;
-    const Uinfo = await User.findOne({ _id: userId })
-    const userInfo = await UserInfo.findOne({ _id: Uinfo.userInfo });
+    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         const category = await Category.findById(req.params.id);
         data.details = category._id;
