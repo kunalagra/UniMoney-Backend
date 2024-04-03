@@ -8,7 +8,7 @@ const authenticateToken = (req, res, next) => {
   
     jwt.verify(token.replace('Bearer ', ''), JWT_SECRET, (err, user) => {
       if (err) return res.status(401).json({ error: 'Invalid token.' });
-      req.user = user;
+      req.user = user.user;
       next();
     });
   };
