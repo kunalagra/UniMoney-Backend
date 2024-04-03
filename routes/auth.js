@@ -1,7 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const app = express();
 const authenticateToken = require('../middleware/authenticateToken');
 const router = express.Router();
 
@@ -47,7 +46,7 @@ router.post('/login', async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ email: user.email }, JWT_SECRET);
+        const token = jwt.sign({ user: user }, JWT_SECRET);
 
         res.json({ message: 'Login successful.', token });
     } catch (error) {
@@ -60,7 +59,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
     try {
         // Find user by email in MongoDB
-        const user = await User.findOne({ _id: req.user._id });
+        const user = await User.findOne({ id: req.user._id });
 
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
