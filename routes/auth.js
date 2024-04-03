@@ -3,9 +3,82 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const UserInfo = require('../models/UserInfo');
 const authenticateToken = require('../middleware/authenticateToken');
+const Transaction = require('../models/Transaction');
+const Category = require('../models/Category');
 const router = express.Router();
 
 const JWT_SECRET = 'secret';
+
+const defaultCategories = [
+    {
+        name: 'ATM',
+        path: "uploads\\cash_withdrawal.png"
+    },
+    {
+        name: 'Bills',
+        path: "uploads\\bill.png"
+    },
+    {
+        name: 'Education',
+        path: "uploads\\education.png"
+    },
+    {
+        name: 'Entertainment',
+        path: "uploads\\entertainment.png"
+    },
+    {
+        name: 'Food & drinks',
+        path: "uploads\\food.png"
+    },
+    {
+        name: 'Fuel',
+        path: "uploads\\fuel.png"
+    },
+    {
+        name: 'Gadgets',
+        path: "uploads\\gadget.png"
+    },
+    {
+        name: 'Groceries',
+        path: "uploads\\cart_shopping.png"
+    },
+    {
+        name: 'Shopping',
+        path: "uploads\\shopping.png"
+    },
+    {
+        name: 'Health',
+        path: "uploads\\medicines.png"
+    },
+    {
+        name: 'Household',
+        path: "uploads\\shampoo.png"
+    },
+    {
+        name: 'House rent',
+        path: "uploads\\house.png"
+    },
+    {
+        name: 'Insurance',
+        path: "uploads\\insurance.png"
+    },
+    {
+        name: 'Investment',
+        path: "uploads\\investment.png"
+    },
+    {
+        name: 'Payments',
+        path: "uploads\\payments.png"
+    },
+    {
+        name: 'Transfers',
+        path: "uploads\\bank.png"
+    },
+    {
+        name: 'Travel',
+        path: "uploads\\travel.png"
+    },
+];
 
 
 router.post('/register', async (req, res) => {
@@ -24,6 +97,22 @@ router.post('/register', async (req, res) => {
         } else {
             // Create new user
             const newUserInfo = new UserInfo(data.userInfo);
+            for (let i=0; i<defaultCategories.length; i++){
+                const category = await Category.findOne({ name: defaultCategories[i].name });
+                if (!category) {
+                    const newCategory = new Category(defaultCategories[i]);
+                    const category = await newCategory.save();
+                    newUserInfo.categories.push({details: category._id});
+                }
+                else{
+                newUserInfo.categories.push({details: category._id});
+                }
+            }
+            for (let i=0; i<data.transaction.length; i++){
+                const newTransaction = new Transaction(data.transaction[i]);
+                const transaction = await newTransaction.save();
+                newUserInfo.transaction.push(transaction._id);
+            }
             const userInfo = await newUserInfo.save();
             data.userInfo = userInfo._id;
             const newUser = await User.create(data);

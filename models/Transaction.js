@@ -5,11 +5,11 @@ const Schema = mongoose.Schema;
 const transactionSchema = new mongoose.Schema({
     amount: Number,
     acc: Number,
-    date: {type: Date, default: Date.now },
-    categories: [{type: Schema.Types.ObjectId, ref: 'Category'}],
+    date: Number,
+    category: {type: Schema.Types.ObjectId, ref: 'Category'},
     type: { type: String, enum: ['debit', 'credit'], default: 'debit' },
     txid: Number,
-    method: { type: String, enum: ['cash','upi', 'credit card', 'debit card','netbank','loan',], default: 'cash' },
+    method: { type: String, enum: ['cash','upi', 'credit card', 'debit card','netbank','loan',], default: 'upi' },
     name: String,
 });
 
