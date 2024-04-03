@@ -1,5 +1,6 @@
 // define the user module
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const userSchema = new mongoose.Schema({
     username: String,

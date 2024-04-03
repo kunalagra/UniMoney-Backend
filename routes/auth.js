@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const UserInfo = require('../models/UserInfo');
 const authenticateToken = require('../middleware/authenticateToken');
 const router = express.Router();
 
@@ -22,8 +23,10 @@ router.post('/register', async (req, res) => {
 
         } else {
             // Create new user
-            const newUser = new User(data);
-            await newUser.save();
+            const newUserInfo = new UserInfo(data.userInfo);
+            const userInfo = await newUserInfo.save();
+            data.userInfo = userInfo._id;
+            const newUser = await User.create(data);
 
             res.status(201).json({ message: 'User registered successfully.', userId: newUser._id.toString() });
         }
@@ -59,7 +62,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
     try {
         // Find user by email in MongoDB
-        const user = await User.findOne({ id: req.user._id });
+        const user = await User.findOne({ id: req.user._id }).populate('userInfo');
 
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
