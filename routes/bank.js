@@ -6,7 +6,9 @@ const UserInfo = require('../models/UserInfo');
 
 
 router.get('/', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id });
+    const uid = req.user._id
+    console.log(uid)
+    const userInfo = await UserInfo.findById({ _id: uid });
     try {
         const allBanks = await Bank.find();
         res.json(allBanks);
