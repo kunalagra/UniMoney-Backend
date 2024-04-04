@@ -12,71 +12,71 @@ const JWT_SECRET = 'secret';
 const defaultCategories = [
     {
         name: 'ATM',
-        path: "uploads\\cash_withdrawal.png"
+        img: "uploads/cash_withdrawal.png"
     },
     {
         name: 'Bills',
-        path: "uploads\\bill.png"
+        img: "uploads/bill.png"
     },
     {
         name: 'Education',
-        path: "uploads\\education.png"
+        img: "uploads/education.png"
     },
     {
         name: 'Entertainment',
-        path: "uploads\\entertainment.png"
+        img: "uploads/entertainment.png"
     },
     {
         name: 'Food & drinks',
-        path: "uploads\\food.png"
+        img: "uploads/food.png"
     },
     {
         name: 'Fuel',
-        path: "uploads\\fuel.png"
+        img: "uploads/fuel.png"
     },
     {
         name: 'Gadgets',
-        path: "uploads\\gadget.png"
+        img: "uploads/gadget.png"
     },
     {
         name: 'Groceries',
-        path: "uploads\\cart_shopping.png"
+        img: "uploads/cart_shopping.png"
     },
     {
         name: 'Shopping',
-        path: "uploads\\shopping.png"
+        img: "uploads/shopping.png"
     },
     {
         name: 'Health',
-        path: "uploads\\medicines.png"
+        img: "uploads/medicines.png"
     },
     {
         name: 'Household',
-        path: "uploads\\shampoo.png"
+        img: "uploads/shampoo.png"
     },
     {
         name: 'House rent',
-        path: "uploads\\house.png"
+        img: "uploads/house.png"
     },
     {
         name: 'Insurance',
-        path: "uploads\\insurance.png"
+        img: "uploads/insurance.png"
     },
     {
         name: 'Investment',
-        path: "uploads\\investment.png"
+        img: "uploads/investment.png"
     },
     {
         name: 'Payments',
-        path: "uploads\\payments.png"
+        img: "uploads/payments.png"
     },
     {
         name: 'Transfers',
-        path: "uploads\\bank.png"
+        img: "uploads/bank.png"
     },
     {
         name: 'Travel',
-        path: "uploads\\travel.png"
+        img: "uploads/travel.png"
     },
 ];
 
