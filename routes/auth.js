@@ -150,15 +150,20 @@ router.post('/login', async (req, res) => {
 
 // Get user profile endpoint
 router.get('/profile', authenticateToken, async (req, res) => {
+    console.log(req.user);
     try {
         // Find user by email in MongoDB
-        const user = await User.findOne({ id: req.user._id }).populate('userInfo');
-
+        const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ error: 'User not found.' });
         }
-
-        res.json({ user });
+        const userInfo = await UserInfo.findById(req.user._id);
+        // populate each category details
+        for (let i=0; i<userInfo.category.length; i++){
+            const category = await Category.findById(userInfo.category[i].details);
+            userInfo.category[i].details = category;
+        }
+        res.json({ user, userInfo });
     } catch (error) {
         // console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
