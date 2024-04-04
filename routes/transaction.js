@@ -31,6 +31,28 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
+// update transaction category
+router.put('/:id', authenticateToken, async (req, res) => {
+    const id = req.params.id;
+    const category = req.body.category;
+    try {
+        const transaction = await Transaction.findById(id);
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found.' });
+        }
+        const newCategory = await Category.findOne({ name: category });
+        if (!newCategory) {
+            return res.status(404).json({ error: 'Category not found.' });
+        }
+        transaction.category = newCategory._id;
+        await transaction.save();
+        res.json(transaction);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
 // Get all transactions
 router.get('/', authenticateToken, async (req, res) => {
     const userInfo = await UserInfo.findById({ _id: req.user._id });
