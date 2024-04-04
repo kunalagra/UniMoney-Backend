@@ -100,15 +100,16 @@ router.post('/register', async (req, res) => {
             const newUser = await User.create(data);
             data.userInfo._id = newUser._id;
             const newUserInfo = new UserInfo(data.userInfo);
+            const categoryLimits = data.userInfo.categoryLimits;
             for (let i=0; i<defaultCategories.length; i++){
                 const category = await Category.findOne({ name: defaultCategories[i].name });
                 if (!category) {
                     const newCategory = new Category(defaultCategories[i]);
                     const category = await newCategory.save();
-                    newUserInfo.category.push({details: category._id});
+                    newUserInfo.category.push({details: category._id, limit: categoryLimits[i]});
                 }
                 else{
-                    newUserInfo.category.push({details: category._id});
+                    newUserInfo.category.push({details: category._id, limit: categoryLimits[i]});
                 }
             }
             for (let i=0; i<data.transaction.length; i++){
