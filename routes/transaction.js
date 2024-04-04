@@ -14,7 +14,7 @@ router.post('/', authenticateToken, async (req, res) => {
     try {
         for (let i = 0; i < dataList.length; i++) {
             const data = dataList[i];
-            const category = await Category.findOne({ name: data.category });
+            const category = await Category.findOne({ name: data.category.name });
             if (!category) {
                 return res.status(400).json({ error: 'Category not found.' });
             }
@@ -35,7 +35,7 @@ router.post('/', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, async (req, res) => {
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } });
+        const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } }).populate('category');
         res.json(transactions);
     } catch (error) {
         console.error(error);

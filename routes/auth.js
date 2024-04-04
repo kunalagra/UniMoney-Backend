@@ -112,8 +112,11 @@ router.post('/register', async (req, res) => {
                     newUserInfo.category.push({details: category._id, limit: categoryLimits[i]});
                 }
             }
+            const cat = await Category.findOne({ name: 'ATM' });
             for (let i=0; i<data.transaction.length; i++){
-                const newTransaction = new Transaction(data.transaction[i]);
+                const temp = data.transaction[i];
+                temp.category = cat._id;
+                const newTransaction = new Transaction(temp);
                 const transaction = await newTransaction.save();
                 newUserInfo.transaction.push(transaction._id);
             }
