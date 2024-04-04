@@ -9,7 +9,6 @@ const authenticateToken = require('../middleware/authenticateToken');
 // Create a new transaction
 router.post('/', authenticateToken, async (req, res) => {
     const dataList = req.body.List;
-    const transactionList = [];
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
         for (let i = 0; i < dataList.length; i++) {
@@ -20,11 +19,10 @@ router.post('/', authenticateToken, async (req, res) => {
             }
             data.category = category._id;
             const transaction = await Transaction.create(data);
-            userInfo.transaction.push(transaction._id);
-            transactionList.push(transaction);
+            userInfo.transaction.unshift(transaction._id);
         }
         await userInfo.save();
-        res.status(201).json({ message: 'Transaction created successfully.', transactionList });
+        res.status(201).json(userInfo);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
