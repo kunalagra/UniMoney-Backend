@@ -16,4 +16,14 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
+
+router.post('/', authenticateToken, async (req, res) => {
+    try {
+        await Bank.insertMany(req.body)
+        res.status(201).json({ message: 'Data Inserted' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
 module.exports = router;
