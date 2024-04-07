@@ -11,7 +11,8 @@ router.post('/', authenticateToken, async (req, res) => {
     const dataList = req.body.List;
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        for (let i = 0; i < dataList.length; i++) {
+        // reverse loop
+        for (let i = dataList.length - 1; i >= 0; i--) {
             const data = dataList[i];
             const category = await Category.findOne({ name: data.category.name });
             if (!category) {
