@@ -18,7 +18,8 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/my', authenticateToken, async (req, res) => {
     try {
-        const userInfo = await UserInfo.findById({ _id: req.user._id }).populate('bank');
+        const userInfo = await UserInfo.findById({ _id: req.user._id })
+            .populate({ path: 'bank.id', model: 'Bank' });
         res.json(userInfo.bank);
     } catch (error) {
         console.error(error);
