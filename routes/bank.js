@@ -16,6 +16,30 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
+router.get('/my', authenticateToken, async (req, res) => {
+    try {
+        const userInfo = await UserInfo.findById({ _id: req.user._id }).populate('bank');
+        res.json(userInfo.bank);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+
+router.post('/add', authenticateToken, async (req, res) => {
+    try {
+        const userInfo = await UserInfo.findById({ _id: req.user._id });
+        const bank = await Bank.findById({ _id: req.body.bankId });
+        userInfo.bank.push({ id: bank._id, number: req.body.number });
+        await userInfo.save();
+        res.status(201).json({ message: 'Bank Added' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+
+});
 
 router.post('/', authenticateToken, async (req, res) => {
     try {
