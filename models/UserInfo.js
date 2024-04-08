@@ -8,8 +8,11 @@ const userinfoSchema = new mongoose.Schema({
     age: String,
     profession: { type: String, enum: ['Student', 'Business', 'Employee', 'Homemaker'], default: 'Employee' },
     transaction: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
-    goals: [String],
-    goalsProgress: [String],
+    category: [{
+        details: { type: Schema.Types.ObjectId, ref: 'Category' },
+        limit:{type: Number, default: 0}
+    }],
+    goal: [{type: Schema.Types.ObjectId, ref: 'Goal'}],
     category: [{
         details: { type: Schema.Types.ObjectId, ref: 'Category' },
         limit:{type: Number, default: 0}
