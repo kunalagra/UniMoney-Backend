@@ -6,9 +6,9 @@ const authenticateToken = (req, res, next) => {
     const token = req.header('Authorization');
     if (!token) return res.status(401).json({ error: 'Unauthorized access. Please log in.' });
   
-    jwt.verify(token.replace('Bearer ', ''), JWT_SECRET, (err, user) => {
+    jwt.verify(token.replace('Bearer ', ''), JWT_SECRET, (err, payload) => {
       if (err) return res.status(401).json({ error: 'Invalid token.' });
-      req.user = user.user;
+      req.user = payload.user;
       next();
     });
   };
