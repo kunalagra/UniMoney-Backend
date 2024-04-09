@@ -31,8 +31,8 @@ router.get('/my', authenticateToken, async (req, res) => {
 router.post('/add', authenticateToken, async (req, res) => {
     try {
         const userInfo = await UserInfo.findById({ _id: req.user._id });
-        const bank = await Bank.findById({ _id: req.body.bankId });
-        userInfo.bank.push({ id: bank._id, number: req.body.number });
+        // const bank = await Bank.findById({ _id: req.body.bankId });
+        userInfo.bank.push({ id: req.body.bankId, number: req.body.number });
         await userInfo.save();
         res.status(201).json({ message: 'Bank Added' });
     } catch (error) {
@@ -42,7 +42,7 @@ router.post('/add', authenticateToken, async (req, res) => {
 
 });
 
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/addBanks', authenticateToken, async (req, res) => {
     try {
         await Bank.insertMany(req.body)
         res.status(201).json({ message: 'Data Inserted' });
