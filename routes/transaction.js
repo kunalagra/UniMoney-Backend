@@ -35,7 +35,7 @@ router.post('/single', authenticateToken, async (req, res) => {
     const data = req.body;
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const category = await Category.findOne({ name: data.category.name });
+        const category = await Category.findOne({ name: data.category });
         if (!category) {
             return res.status(400).json({ error: 'Category not found.' });
         }
@@ -95,6 +95,17 @@ router.get('/month/:month', authenticateToken, async (req, res) => {
             return date.getMonth()+1 === month;
         });
         res.json(filteredTransactions);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+// get categories and bank details of user
+router.get('/info', authenticateToken, async (req, res) => {
+    const userInfo = await UserInfo.findById({ _id: req.user._id }).populate({path: 'category.details', model: 'Category'}).populate({path: 'bank.id', model: 'Bank'});
+    try {
+        res.json(userInfo)
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
