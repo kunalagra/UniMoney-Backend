@@ -154,7 +154,7 @@ router.post('/login', async (req, res) => {
 
 // Get user profile endpoint
 router.get('/profile', authenticateToken, async (req, res) => {
-    console.log(req.user);
+    // console.log(req.user);
     try {
         // Find user by email in MongoDB
         const user = await User.findById(req.user._id);

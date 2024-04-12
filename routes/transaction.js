@@ -75,7 +75,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 // Get all transactions
 router.get('/', authenticateToken, async (req, res) => {
     const userInfo = await UserInfo.findById({ _id: req.user._id })
-    const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } }).populate('category').sort({field: 'date'})
+    const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } }).populate('category').sort('date')
     try {
         res.json(transactions);
     } catch (error) {
