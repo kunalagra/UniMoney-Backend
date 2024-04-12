@@ -10,6 +10,7 @@ const category = require('./routes/category');
 const path = require('path');
 const transaction = require('./routes/transaction');
 const bank = require('./routes/bank');
+const streak = require('./routes/streak');
 
 app.use(express.json({limit: '25mb'}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -27,6 +28,7 @@ app.get("/free", (req, res) => {
 app.use('/category', category);
 app.use('/transaction', transaction);
 app.use('/bank', bank);
+app.use('/streak', streak);
 
 
 app.listen(port, () => {

@@ -30,25 +30,6 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-// add single transaction
-router.post('/single', authenticateToken, async (req, res) => {
-    const data = req.body;
-    const userInfo = await UserInfo.findById({ _id: req.user._id });
-    try {
-        const category = await Category.findOne({ name: data.category });
-        if (!category) {
-            return res.status(400).json({ error: 'Category not found.' });
-        }
-        data.category = category._id;
-        const transaction = await Transaction.create(data);
-        userInfo.transaction.unshift(transaction._id);
-        await userInfo.save();
-        res.status(201).json(userInfo);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error.' });
-    }
-});
 
 // update transaction category
 router.put('/:id', authenticateToken, async (req, res) => {
