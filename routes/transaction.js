@@ -20,7 +20,7 @@ router.post('/', authenticateToken, async (req, res) => {
             }
             data.category = category._id;
             const transaction = await Transaction.create(data);
-            userInfo.transaction.unshift(transaction._id);
+            userInfo.transaction.push(transaction._id);
         }
         await userInfo.save();
         res.status(201).json(userInfo);
@@ -74,9 +74,10 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
 // Get all transactions
 router.get('/', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id }).populate({path: 'transaction', populate: {path: 'category'}});
+    const userInfo = await UserInfo.findById({ _id: req.user._id })
+    const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } }).populate('category').sort({field: 'date'})
     try {
-        res.json(userInfo.transaction);
+        res.json(transactions);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
