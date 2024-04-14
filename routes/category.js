@@ -42,20 +42,14 @@ router.get('/:id', authenticateToken, async (req, res) => {
 
 // Create a new category
 router.post('/', upload.single('img'), authenticateToken, async (req, res) => {
-    const file = req.file;
-    // console.log(file);
+    const img = req.body.img;
     const name = req.body.name;
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const newCategory = await Category.create({ name, img: file.path });
+        const newCategory = await Category.create({ name, img });
         userInfo.category.push({ details: newCategory._id });
         await userInfo.save();
         res.status(201).json(newCategory);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error.' });
-    }
-    try {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
