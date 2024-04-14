@@ -41,7 +41,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create a new category
-router.post('/', upload.single('img'), authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
     const img = req.body.img;
     const name = req.body.name;
     const userInfo = await UserInfo.findById({ _id: req.user._id });
