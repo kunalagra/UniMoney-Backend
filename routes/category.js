@@ -4,25 +4,13 @@ const Category = require('../models/Category');
 const UserInfo = require('../models/UserInfo');
 const User = require('../models/User');
 const authenticateToken = require('../middleware/authenticateToken');
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-    destination: 'uploads/',
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    },
-  });
-
-const upload = multer({ storage: storage });
-
 
 // Get all categories
 router.get('/', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const categories = await Category.find({ _id: { $in: userInfo.category.map((category) => category.details) } });
+        const categories = await UserInfo.findById({ _id: req.user._id }).populate('category.details');
         
-        res.json(categories);
+        res.json(categories.category);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
