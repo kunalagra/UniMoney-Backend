@@ -14,11 +14,11 @@ router.post('/', authenticateToken, async (req, res) => {
         // reverse loop
         for (let i = dataList.length - 1; i >= 0; i--) {
             const data = dataList[i];
-            // const category = await Category.findOne({ name: data.category.name });
-            // if (!category) {
-            //     return res.status(400).json({ error: 'Category not found.' });
-            // }
-            // data.category = category._id;
+            const category = await Category.findOne({ name: data.category.name });
+            if (!category) {
+                return res.status(400).json({ error: 'Category not found.' });
+            }
+            data.category = category._id;
             const transaction = await Transaction.create(data);
             userInfo.transaction.push(transaction._id);
         }
