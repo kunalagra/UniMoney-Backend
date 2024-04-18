@@ -13,10 +13,6 @@ const userinfoSchema = new mongoose.Schema({
         limit:{type: Number, default: 0}
     }],
     goal: [{type: Schema.Types.ObjectId, ref: 'Goal'}],
-    category: [{
-        details: { type: Schema.Types.ObjectId, ref: 'Category' },
-        limit:{type: Number, default: 0}
-    }],
     bank: [{
         id: { type: Schema.Types.ObjectId, ref: 'Bank' },
         number: Number,
