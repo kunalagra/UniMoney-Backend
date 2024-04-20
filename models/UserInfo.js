@@ -17,7 +17,8 @@ const userinfoSchema = new mongoose.Schema({
         id: { type: Schema.Types.ObjectId, ref: 'Bank' },
         number: Number,
         card: [{ type: Schema.Types.ObjectId, ref: 'Card' }]
-    }]
+    }],
+    reminder: [{type: Schema.Types.ObjectId, ref: 'Reminder'}]
 });
 
 
