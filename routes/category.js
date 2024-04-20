@@ -44,15 +44,20 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
-// Update a category and its limit by ID
-router.put('/:id', authenticateToken, async (req, res) => {
-    data = req.body;
+// Update a limit of a category useing category name
+router.put('/limit', authenticateToken, async (req, res) => {
+    const name = req.body.name;
+    const limit = req.body.limit;
     const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const category = await Category.findById(req.params.id);
-        data.details = category._id;
-        const updatedCategory = await UserInfo.findOneAndUpdate({ _id: userInfo._id, 'categories.details': category._id }, { $set: { 'categories.$': data } }, { new: true });
-        res.json(updatedCategory);
+        const category = await Category.findOne({ name });
+        if (!category) {
+            return res.status(400).json({ error: 'Category not found.' });
+        }
+        const index = userInfo.category.findIndex((cat) => cat.details._id.toString() === category._id.toString());
+        userInfo.category[index].limit = limit;
+        await userInfo.save();
+        res.json(userInfo.category[index]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
