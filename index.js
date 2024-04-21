@@ -11,6 +11,8 @@ const path = require('path');
 const transaction = require('./routes/transaction');
 const bank = require('./routes/bank');
 const streak = require('./routes/streak');
+const reminder = require('./routes/reminder');
+
 
 app.use(express.json({limit: '25mb'}));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -22,13 +24,11 @@ app.use(cors());
 app.use(express.urlencoded({extended: false}));
 
 app.use('/auth', auth);
-app.get("/free", (req, res) => {
-    res.send("This is a free endpoint.");
-});
 app.use('/category', category);
 app.use('/transaction', transaction);
 app.use('/bank', bank);
 app.use('/streak', streak);
+app.use('/reminder', reminder);
 
 
 app.listen(port, () => {
