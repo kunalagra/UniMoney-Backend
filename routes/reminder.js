@@ -36,5 +36,31 @@ router.post('/create', authenticateToken, async (req, res) => {
 
 });
 
+router.put('/update', authenticateToken, async (req, res) => {
+    try {
+        const category = await Category.findOne({ name: req.body.category });
+        req.body.category = category._id;
+        await Reminder.findByIdAndUpdate(req.body._id, req.body);
+        res.status(200).json({ message: 'Reminder Updated' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+router.delete('/delete', authenticateToken, async (req, res) => {
+    try {
+        await Reminder.findByIdAndDelete(req.body._id);
+        const userInfo = await UserInfo.findById({ _id: req.user._id });
+        userInfo.reminder = userInfo.reminder.filter((reminder) => reminder != req.body._id);
+        await userInfo.save();
+        res.status(200).json({ message: 'Reminder Deleted' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+
 
 module.exports = router;
