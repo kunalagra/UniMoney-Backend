@@ -11,7 +11,7 @@ router.get('/', authenticateToken, async (req, res) => {
     try {
         const userInfo = await UserInfo.findById({ _id: req.user._id })
         // get the reminder which are in future and populate the category
-        const reminders = await Reminder.find({ _id: { $in: userInfo.reminder }, date: { $gte: new Date() } }).populate('category');
+        const reminders = await Reminder.find({ _id: { $in: userInfo.reminder } }).populate('category');
         res.json(reminders);
     } catch (error) {
         console.error(error);
