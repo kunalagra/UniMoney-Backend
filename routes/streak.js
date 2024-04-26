@@ -32,7 +32,7 @@ router.get('/visit', authenticateToken, async (req, res) => {
             if (daysSinceLastLogin === 1) {
                 streak.consecutiveLoginDays++;
                 if (streak.consecutiveLoginDays % 10 === 0) {
-                    streak.rollss++; // Add rolls
+                    streak.rolls++; // Add rolls
                     streak.trophies++;
                 }
             } else {

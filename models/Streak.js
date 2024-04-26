@@ -18,7 +18,7 @@ const streaksSchema = new mongoose.Schema({
     },
     totalPoints: {
         type: Number,
-        default: 0
+        default: 1,
     },
     consecutiveLoginDays: {
         type: Number,
