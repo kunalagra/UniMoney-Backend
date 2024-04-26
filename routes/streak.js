@@ -33,6 +33,7 @@ router.get('/visit', authenticateToken, async (req, res) => {
                 streak.consecutiveLoginDays++;
                 if (streak.consecutiveLoginDays % 10 === 0) {
                     streak.rollss++; // Add rolls
+                    streak.trophies++;
                 }
             } else {
                 streak.loginStreaks.push({
@@ -77,11 +78,11 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
-        const top5 = await Streak.find().sort({totalPoints:-1}).limit(5).populate('_id');
+        const top5 = await Streak.find().sort({trophies:-1}).limit(5);
         const user = await Streak.findOne({ _id: req.user._id });
         let currentRank = 0;
         if (user) {
-            currentRank = await Streak.countDocuments({ rank: { $gt: user.totalPoints } }) + 1;
+            currentRank = await Streak.countDocuments({ rank: { $gt: user.trophies } }) + 1;
         }
         res.status(200).json({ top5, currentRank })
     } catch (err) {
