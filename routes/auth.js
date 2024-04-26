@@ -175,6 +175,28 @@ router.get('/profile', authenticateToken, async (req, res) => {
 
 });
 
+// Update user profile endpoint
+router.put('/profile', authenticateToken, async (req, res) => {
+    const data = req.body;
+    try {
+        // Find user by email in MongoDB
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found.' });
+        }
+        // Update user data
+        user.username = data.username;
+        user.email = data.email;
+        user.image = data.image;
+        await user.save();
+        res.json({ message: 'User updated successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+
 // User logout endpoint (JWT token is stateless, so nothing specific to do on the server)
 router.post('/logout', authenticateToken, (req, res) => {
     res.json({ message: 'Logout successful.' });
