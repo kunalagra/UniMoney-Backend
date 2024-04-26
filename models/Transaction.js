@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema({
     date: Number,
     category: {type: Schema.Types.ObjectId, ref: 'Category'},
     type: { type: String, enum: ['debit', 'credit'], default: 'debit' },
-    txid: Number,
+    txid: String,
     method: { type: String, enum: ['cash','upi', 'credit card', 'debit card','netbank','loan',], default: 'upi' },
     name: String,
 });
