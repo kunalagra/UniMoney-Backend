@@ -106,11 +106,12 @@ router.get('/info', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     try {
-        const transaction = await Transaction.findById(id);
+        const transaction = await Transaction.deleteOne({
+            _id: id
+        });
         if (!transaction) {
             return res.status(404).json({ error: 'Transaction not found.' });
         }
-        await transaction.remove();
         res.json({ message: 'Transaction deleted successfully.' });
     } catch (error) {
         console.error(error);
