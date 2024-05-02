@@ -9,13 +9,11 @@ const Streak = require('../models/Streak');
 const authenticateToken = require('../middleware/authenticateToken');
 
 // Update user visit and login
+
 router.get('/visit', authenticateToken, async (req, res) => {
     try {
         let streak = await Streak.findOne({ _id: req.user._id });
-        if (!streak) {
-            streak = await Streak.create({ _id: req.user._id, name: req.user.username });
-            res.status(200).json({ message: 'Visit logged successfully' });
-        }
+
         let today = new Date();
         let lastLogin = new Date(streak.lastLogin);
         const dayinMS =  1000 * 60 * 60 * 24;
@@ -23,8 +21,10 @@ router.get('/visit', authenticateToken, async (req, res) => {
         today.setHours(0, 0, 0, 0);
         const daysSinceLastLogin = (today - lastLogin) / dayinMS;
 
+        let message;
+
         if (daysSinceLastLogin < 1) {
-            res.status(200).json({ message: 'Already visited today, points remain the same' });
+            message = 'Already visited today, points remain the same';
         } else {
             streak.lastLogin = today;
             streak.totalPoints++;
@@ -45,14 +45,15 @@ router.get('/visit', authenticateToken, async (req, res) => {
             }
         
             await streak.save();
-            res.status(200).json({ message: 'Visit logged successfully' });
+            message = 'Visit logged successfully';
         }
+
+        res.status(200).json({ message });
     } catch (err) {
         console.error('Error logging visit', err);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
 router.post('/useRoll', authenticateToken, async (req, res) => {
     try {
         let user = await Streak.findOne({ _id: req.user._id });
