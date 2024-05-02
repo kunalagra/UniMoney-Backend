@@ -55,12 +55,9 @@ router.post('/addBanks', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     try {
-        const bank = await Bank.deleteOne({
-            _id: id
-        });
-        if (!bank) {
-            return res.status(404).json({ error: 'Bank not found.' });
-        }
+        const userInfo = await UserInfo.findById({ _id: req.user._id });
+        userInfo.bank = userInfo.bank.filter(bank => bank.id != id);
+        await userInfo.save();
         res.json({ message: 'Bank deleted successfully.' });
     } catch (error) {
         console.error(error);
