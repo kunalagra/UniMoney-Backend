@@ -5,6 +5,7 @@ const UserInfo = require('../models/UserInfo');
 const authenticateToken = require('../middleware/authenticateToken');
 const Transaction = require('../models/Transaction');
 const Category = require('../models/Category');
+const Streak = require('../models/Streak');
 const router = express.Router();
 
 const JWT_SECRET = 'secret';
