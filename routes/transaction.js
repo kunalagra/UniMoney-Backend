@@ -40,11 +40,14 @@ router.put('/:id', authenticateToken, async (req, res) => {
         if (!transaction) {
             return res.status(404).json({ error: 'Transaction not found.' });
         }
-        transaction.amount = amount;
-        transaction.acc = acc;
-        transaction.type = type;
-        transaction.name = name;
-        transaction.comment = desc;
+        if (amount) {
+            transaction.amount = amount;
+            transaction.amount = amount;
+            transaction.acc = acc;
+            transaction.type = type;
+            transaction.name = name;
+            transaction.comment = desc;
+        }
         const newCategory = await Category.findOne({ name: category });
         if (!newCategory) {
             return res.status(404).json({ error: 'Category not found.' });
@@ -78,8 +81,8 @@ router.get('/month/:month', authenticateToken, async (req, res) => {
         const month = parseInt(req.params.month);
         const filteredTransactions = transactions.filter((transaction) => {
             // const date = new Date(transaction.date);
-            console.log(date.getMonth()+1);
-            return date.getMonth()+1 === month;
+            console.log(date.getMonth() + 1);
+            return date.getMonth() + 1 === month;
         });
         res.json(filteredTransactions);
     } catch (error) {
@@ -90,7 +93,7 @@ router.get('/month/:month', authenticateToken, async (req, res) => {
 
 // get categories and bank details of user
 router.get('/info', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id }).populate({path: 'category.details', model: 'Category'}).populate({path: 'bank.id', model: 'Bank'});
+    const userInfo = await UserInfo.findById({ _id: req.user._id }).populate({ path: 'category.details', model: 'Category' }).populate({ path: 'bank.id', model: 'Bank' });
     try {
         res.json(userInfo)
     } catch (error) {
