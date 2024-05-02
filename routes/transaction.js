@@ -34,12 +34,17 @@ router.post('/', authenticateToken, async (req, res) => {
 // update transaction category
 router.put('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
-    const category = req.body.category;
+    const { category, amount, acc, type, name, desc } = req.body;
     try {
         const transaction = await Transaction.findById(id);
         if (!transaction) {
             return res.status(404).json({ error: 'Transaction not found.' });
         }
+        transaction.amount = amount;
+        transaction.acc = acc;
+        transaction.type = type;
+        transaction.name = name;
+        transaction.comment = desc;
         const newCategory = await Category.findOne({ name: category });
         if (!newCategory) {
             return res.status(404).json({ error: 'Category not found.' });
@@ -94,5 +99,20 @@ router.get('/info', authenticateToken, async (req, res) => {
     }
 });
 
+// delete a transaction
+router.delete('/:id', authenticateToken, async (req, res) => {
+    const id = req.params.id;
+    try {
+        const transaction = await Transaction.findById(id);
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found.' });
+        }
+        await transaction.remove();
+        res.json({ message: 'Transaction deleted successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
 
 module.exports = router;
