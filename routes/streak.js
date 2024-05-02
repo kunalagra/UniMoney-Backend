@@ -39,7 +39,7 @@ router.get('/visit', authenticateToken, async (req, res) => {
                 streak.loginStreaks.push({
                     startDate: new Date(lastLogin.getTime() - ((streak.consecutiveLoginDays-1) * 24 * 60 * 60 * 1000)),
                     endDate: lastLogin,
-                    consecutiveDays: streak.consecutiveLoginDays
+                    consecutiveDays: streak.consecutiveLoginDays-1
                 });
                 streak.consecutiveLoginDays = 1;
             }
@@ -69,6 +69,8 @@ router.post('/useRoll', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, async (req, res) => {
     try {
         let streak = await Streak.findOne({ _id: req.user._id });
+        // i am geting login streaks as object, so converting it to array
+        streak.loginStreaks = Object.values(streak.loginStreaks);
         res.status(200).json({ streak });
 
     } catch (err) {
