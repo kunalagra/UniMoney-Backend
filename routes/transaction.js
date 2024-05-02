@@ -118,4 +118,19 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// get transaction by id
+router.get('/:id', authenticateToken, async (req, res) => {
+    const id = req.params.id;
+    try {
+        const transaction = await Transaction.findById(id).populate('category');
+        if (!transaction) {
+            return res.status(404).json({ error: 'Transaction not found.' });
+        }
+        res.json(transaction);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
 module.exports = router;
