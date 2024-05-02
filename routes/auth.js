@@ -98,6 +98,7 @@ router.post('/register', async (req, res) => {
             // Create new user
 
             const newUser = await User.create(data);
+            const streak = await Streak.create({ _id: newUser._id, name: newUser.username });
             data.userInfo._id = newUser._id;
             const newUserInfo = new UserInfo(data.userInfo);
             const categoryLimits = data.userInfo.categoriesLimits;
@@ -121,7 +122,7 @@ router.post('/register', async (req, res) => {
                 newUserInfo.transaction.push(transaction._id);
             }
             await newUserInfo.save();
-
+            
             res.status(201).json({ message: 'User registered successfully.', userId: newUser._id.toString() });
         }
     } catch (error) {
