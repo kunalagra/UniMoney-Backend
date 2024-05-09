@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const transactionSchema = new mongoose.Schema({
+    user: {type: Schema.Types.ObjectId, ref: 'UserInfo', required: true},
     amount: Number,
     acc: Number,
     date: Number,

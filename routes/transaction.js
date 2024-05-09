@@ -9,7 +9,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 // Create a new transaction
 router.post('/', authenticateToken, async (req, res) => {
     const dataList = req.body.List;
-    const userInfo = await UserInfo.findById({ _id: req.user._id });
+    // directly use ID for category
     try {
         // reverse loop
         for (let i = dataList.length - 1; i >= 0; i--) {
@@ -19,11 +19,10 @@ router.post('/', authenticateToken, async (req, res) => {
                 return res.status(400).json({ error: 'Category not found.' });
             }
             data.category = category._id;
-            const transaction = await Transaction.create(data);
-            userInfo.transaction.push(transaction._id);
+            data.user = req.user._id;
+            await Transaction.create(data);
         }
-        await userInfo.save();
-        res.status(201).json(userInfo);
+        res.status(201).json("Data Added Succesfully");
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
@@ -31,7 +30,7 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 
-// update transaction category
+// update transaction
 router.put('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
     const { category, amount, acc, type, name, desc } = req.body;
@@ -41,7 +40,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Transaction not found.' });
         }
         if (amount) {
-            transaction.amount = amount;
             transaction.amount = amount;
             transaction.acc = acc;
             transaction.type = type;
@@ -63,8 +61,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
 // Get all transactions
 router.get('/', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id })
-    const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } }).populate('category').sort('-date')
+    const transactions = await Transaction.find({ user: req.user._id }).populate('category').sort('-date')
     try {
         res.json(transactions);
     } catch (error) {
@@ -75,9 +72,8 @@ router.get('/', authenticateToken, async (req, res) => {
 
 // get transactions by month but transaction as type date
 router.get('/month/:month', authenticateToken, async (req, res) => {
-    const userInfo = await UserInfo.findById({ _id: req.user._id });
     try {
-        const transactions = await Transaction.find({ _id: { $in: userInfo.transaction } });
+        const transactions = await Transaction.find({ user: req.user._id });
         const month = parseInt(req.params.month);
         const filteredTransactions = transactions.filter((transaction) => {
             // const date = new Date(transaction.date);
