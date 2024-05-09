@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -7,8 +8,7 @@ const Transaction = require('../models/Transaction');
 const Category = require('../models/Category');
 const Streak = require('../models/Streak');
 const router = express.Router();
-
-const JWT_SECRET = 'secret';
+require('dotenv').config();
 
 const defaultCategories = [
     {
@@ -96,10 +96,10 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'User already exists.' });
 
         } else {
-            // Create new user
-
+            const hash = bcrypt.hashSync(data.password, 10);
+            data.password = hash;
             const newUser = await User.create(data);
-            const streak = await Streak.create({ _id: newUser._id, name: newUser.username });
+            await Streak.create({ _id: newUser._id, name: newUser.username });
             data.userInfo._id = newUser._id;
             const newUserInfo = new UserInfo(data.userInfo);
             const categoryLimits = data.userInfo.categoriesLimits;
@@ -114,13 +114,15 @@ router.post('/register', async (req, res) => {
                     newUserInfo.category.push({details: category._id, limit: categoryLimits[i]});
                 }
             }
-            for (let i=0; i<data.transaction.length; i++){
-                const temp = data.transaction[i];
-                const cat = await Category.findOne({ name: temp.category });
-                temp.category = cat._id;
-                const newTransaction = new Transaction(temp);
-                const transaction = await newTransaction.save();
-                newUserInfo.transaction.push(transaction._id);
+            if (data.transaction){
+                for (let i=0; i<data.transaction.length; i++){
+                    const temp = data.transaction[i];
+                    const cat = await Category.findOne({ name: temp.category });
+                    temp.category = cat._id;
+                    const newTransaction = new Transaction(temp);
+                    const transaction = await newTransaction.save();
+                    newUserInfo.transaction.push(transaction._id);
+                }
             }
             await newUserInfo.save();
             
@@ -137,17 +139,15 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        // Find user by email and password in MongoDB
-        const user = await User.findOne({ email, password });
-
-        if (!user) {
+        const user = await User.findOne({ email });
+        if (user && bcrypt.compareSync(password, user.password)) {
+            const token = jwt.sign({user}, process.env.JWT_SECRET);
+            return res.json({ message: 'Login successful.', token });
+        }
+        else{
             return res.status(401).json({ error: 'Invalid credentials.' });
         }
 
-        // Generate JWT token
-        const token = jwt.sign({user}, JWT_SECRET);
-
-        res.json({ message: 'Login successful.', token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
