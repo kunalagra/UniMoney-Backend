@@ -114,17 +114,17 @@ router.post('/register', async (req, res) => {
                     newUserInfo.category.push({details: category._id, limit: categoryLimits[i]});
                 }
             }
+            await newUserInfo.save();
+            // to-do: drop transaction from register call and move it to POST /transacation
             if (data.transaction){
                 for (let i=0; i<data.transaction.length; i++){
                     const temp = data.transaction[i];
                     const cat = await Category.findOne({ name: temp.category });
                     temp.category = cat._id;
-                    const newTransaction = new Transaction(temp);
-                    const transaction = await newTransaction.save();
-                    newUserInfo.transaction.push(transaction._id);
+                    temp.user = newUser._id;
+                    await Transaction.create(temp);
                 }
             }
-            await newUserInfo.save();
             
             res.status(201).json({ message: 'User registered successfully.', userId: newUser._id.toString() });
         }
