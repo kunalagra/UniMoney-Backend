@@ -132,6 +132,22 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// delete all transaction
+router.delete('/cleardata', authenticateToken, async (req, res) => {
+    try {
+        const data = await Transaction.deleteMany({
+            user: req.user._id
+        });
+        if (data.deletedCount===0) {
+            return res.status(404).json({ error: 'Transactions not found for the User' });
+        }
+        res.json({ message: 'All Transaction deleted successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
 // get transaction by id
 router.get('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
