@@ -70,6 +70,23 @@ router.get('/', authenticateToken, async (req, res) => {
     }
 });
 
+// filter transactions between range (unix timestamp)
+router.get('/range/:start/:end',authenticateToken, async (req, res) => {
+    try {
+        const start = parseInt(req.params.start);
+        const end = parseInt(req.params.end);
+        const transactions = await Transaction.find({ 
+            user: req.user._id,
+            value: { $gte: start, $lte: end } 
+        });
+        return res.json(transactions)
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
 // get transactions by month but transaction as type date
 router.get('/month/:month', authenticateToken, async (req, res) => {
     try {
