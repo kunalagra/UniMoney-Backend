@@ -133,7 +133,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 });
 
 // delete all transaction
-router.delete('/cleardata', authenticateToken, async (req, res) => {
+router.get('/cleardata', authenticateToken, async (req, res) => {
     try {
         const data = await Transaction.deleteMany({
             user: req.user._id
@@ -141,7 +141,7 @@ router.delete('/cleardata', authenticateToken, async (req, res) => {
         if (data.deletedCount===0) {
             return res.status(404).json({ error: 'Transactions not found for the User' });
         }
-        res.json({ message: 'All Transaction deleted successfully.' });
+        res.json({ message: `${data.deletedCount} Transaction deleted successfully.` });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
