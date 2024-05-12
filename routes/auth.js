@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt');
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const authenticateToken = require('../middleware/authenticateToken');
 const User = require('../models/User');
 const UserInfo = require('../models/UserInfo');
-const authenticateToken = require('../middleware/authenticateToken');
 const Transaction = require('../models/Transaction');
 const Category = require('../models/Category');
 const Streak = require('../models/Streak');
+const Reminder = require('../models/Reminder');
 const router = express.Router();
 require('dotenv').config();
 
@@ -198,10 +199,36 @@ router.put('/profile', authenticateToken, async (req, res) => {
     }
 });
 
-
 // User logout endpoint (JWT token is stateless, so nothing specific to do on the server)
-router.post('/logout', authenticateToken, (req, res) => {
-    res.json({ message: 'Logout successful.' });
+router.post('/logout', authenticateToken, async (req, res) => {
+    return res.json({ message: 'Logout successful.' });
+});
+
+// Account delete Endpoint
+//to-do delete new category created by user
+router.delete('/deleteaccount', authenticateToken, async (req, res) => {
+    try {
+        await Transaction.deleteMany({
+            user: req.user._id
+        });
+        await Reminder.deleteMany({
+            user: req.user._id
+        });
+        await Streak.deleteOne({
+            user: req.user._id
+        });
+        await UserInfo.deleteOne({
+            user: req.user._id
+        });
+        await User.deleteOne({
+            user: req.user._id
+        });
+        return res.json({ message: 'Complete Account Deleted' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+
 });
 
 module.exports = router;
