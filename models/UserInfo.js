@@ -17,7 +17,6 @@ const userinfoSchema = new mongoose.Schema({
         number: {type: Number, required: true},
         card: [{ type: Schema.Types.ObjectId, ref: 'Card' }]
     }],
-    reminder: [{type: Schema.Types.ObjectId, ref: 'Reminder'}]
 });
 
 
