@@ -82,7 +82,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
         // get top 5 users based on trophies
-        const top5 = await Streak.find().sort({ trophies: -1 }).limit(5);
+        const top5 = await Streak.find().sort({ trophies: -1, totalPoints: -1, name: 1 }).limit(5);
         // get current user rank based on trophies
         const user = await Streak.findOne({ _id: req.user._id });
         const currentRank = await Streak.find({ trophies: { $gt: user.trophies } }).countDocuments() + 1;
