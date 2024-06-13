@@ -29,6 +29,10 @@ const streaksSchema = new mongoose.Schema({
         endDate: Date,
         consecutiveDays: Number
     }],
+    rewardDates: [{
+        date: Date,
+        type: Number
+    }]        
     rolls: {
         type: Number,
         default: 0
