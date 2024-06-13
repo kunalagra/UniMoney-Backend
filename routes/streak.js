@@ -158,12 +158,12 @@ router.post('/useRoll', authenticateToken, async (req, res) => {
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        let streak = await Streak.findOne({ _id: req.user._id });
-        let flattened =  await flattenStreakData(streak)
-        result = streak.toObject();
-        delete result['loginStreaks']; 
-        result['data'] = flattened;
-        res.status(200).json({ result });
+        let result = await Streak.findOne({ _id: req.user._id });
+        let flattened =  await flattenStreakData(result)
+        streak = result.toObject();
+        delete streak['loginStreaks']; 
+        streak['data'] = flattened;
+        res.status(200).json({ streak });
 
         // streak.loginStreaks = Object.values(streak.loginStreaks);
         // res.status(200).json({ streak });
