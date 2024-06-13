@@ -11,7 +11,7 @@ const authenticateToken = require('../middleware/authenticateToken');
 
 
 async function flattenStreakData(input) {
-    // Helper function to get month and year key
+    // Helper functions and logic to flatten the streak data
     function getMonthYearKey(date) {
         const d = new Date(date);
         const month = d.toLocaleString('default', { month: 'short' });
@@ -19,7 +19,6 @@ async function flattenStreakData(input) {
         return `${month}'${year}`;
     }
 
-    // Helper function to get number of days in a month
     function getDaysInMonth(date) {
         const d = new Date(date);
         return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
@@ -28,20 +27,18 @@ async function flattenStreakData(input) {
     const result = {};
     const uniqueMonths = new Set();
 
-    // Extract unique months from loginStreaks and rewardDates
-    input.streak.loginStreaks.forEach(streak => {
+    input.loginStreaks.forEach(streak => {
         const startMonthYear = getMonthYearKey(streak.startDate);
         const endMonthYear = getMonthYearKey(streak.endDate);
         uniqueMonths.add(startMonthYear);
         uniqueMonths.add(endMonthYear);
     });
 
-    input.streak.rewardDates.forEach(reward => {
+    input.rewardDates.forEach(reward => {
         const rewardMonthYear = getMonthYearKey(reward.date);
         uniqueMonths.add(rewardMonthYear);
     });
 
-    // Initialize result object with empty login data for each unique month
     uniqueMonths.forEach(monthYear => {
         const [month, year] = monthYear.split("'");
         const date = new Date(`20${year}-${month}-01`);
@@ -50,8 +47,7 @@ async function flattenStreakData(input) {
         result[monthYear] = { days: daysArray };
     });
 
-    // Populate the login days based on loginStreaks
-    input.streak.loginStreaks.forEach(streak => {
+    input.loginStreaks.forEach(streak => {
         const startDate = new Date(streak.startDate);
         const endDate = new Date(streak.endDate);
 
@@ -65,11 +61,10 @@ async function flattenStreakData(input) {
         }
     });
 
-    // Handle the latest streak based on lastLogin and consecutiveLoginDays
-    const lastLoginDate = new Date(input.streak.lastLogin);
+    const lastLoginDate = new Date(input.lastLogin);
     const latestStreakEndDate = new Date(lastLoginDate);
     const latestStreakStartDate = new Date(lastLoginDate);
-    latestStreakStartDate.setDate(latestStreakEndDate.getDate() - input.streak.consecutiveLoginDays + 1);
+    latestStreakStartDate.setDate(latestStreakEndDate.getDate() - input.consecutiveLoginDays + 1);
 
     while (latestStreakStartDate <= latestStreakEndDate) {
         const monthYear = getMonthYearKey(latestStreakStartDate);
@@ -80,8 +75,7 @@ async function flattenStreakData(input) {
         latestStreakStartDate.setDate(latestStreakStartDate.getDate() + 1);
     }
 
-    // Populate reward days based on rewardDates
-    input.streak.rewardDates.forEach(reward => {
+    input.rewardDates.forEach(reward => {
         const rewardDate = new Date(reward.date);
         const monthYear = getMonthYearKey(rewardDate);
         const dayIndex = rewardDate.getDate() - 1;
@@ -165,9 +159,12 @@ router.post('/useRoll', authenticateToken, async (req, res) => {
 router.get('/', authenticateToken, async (req, res) => {
     try {
         let streak = await Streak.findOne({ _id: req.user._id });
-        let res = await flattenStreakData(streak)
+        let flattened =  await flattenStreakData(streak)
+        result = streak.toObject();
+        delete result['loginStreaks']; 
+        result['data'] = flattened;
         res.status(200).json({ result });
-        // i am geting login streaks as object, so converting it to array
+
         // streak.loginStreaks = Object.values(streak.loginStreaks);
         // res.status(200).json({ streak });
 
