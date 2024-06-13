@@ -32,7 +32,7 @@ const streaksSchema = new mongoose.Schema({
     rewardDates: [{
         date: Date,
         type: Number
-    }]        
+    }],
     rolls: {
         type: Number,
         default: 0
