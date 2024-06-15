@@ -30,6 +30,25 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 
+router.post('/add', authenticateToken, async (req, res) => {
+    const data = req.body;
+    try {
+        const category = await Category.findOne({ name: data.category.name });
+        if (!category) {
+            return res.status(400).json({ error: 'Category not found.' });
+        }
+        data.category = category._id;
+        data.user = req.user._id;
+        const transaction = await Transaction.create(data);
+        res.status(201).json(transaction);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error.' });
+    }
+});
+
+
+
 // update transaction
 router.put('/:id', authenticateToken, async (req, res) => {
     const id = req.params.id;
