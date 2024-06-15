@@ -40,7 +40,10 @@ router.post('/add', authenticateToken, async (req, res) => {
         data.category = category._id;
         data.user = req.user._id;
         const transaction = await Transaction.create(data);
-        res.status(201).json(transaction.populate('category'));
+        // populate category field
+        await transaction.populate('category').execPopulate();
+        res.status(201).json(transaction);
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error.' });
