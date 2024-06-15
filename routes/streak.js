@@ -8,6 +8,85 @@ const Streak = require('../models/Streak');
 
 const authenticateToken = require('../middleware/authenticateToken');
 
+
+
+async function flattenStreakData(input) {
+    // Helper functions and logic to flatten the streak data
+    function getMonthYearKey(date) {
+        const d = new Date(date);
+        const month = d.toLocaleString('default', { month: 'short' });
+        const year = d.getFullYear().toString().slice(-2);
+        return `${month}'${year}`;
+    }
+
+    function getDaysInMonth(date) {
+        const d = new Date(date);
+        return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    }
+
+    const result = {};
+    const uniqueMonths = new Set();
+
+    input.loginStreaks.forEach(streak => {
+        const startMonthYear = getMonthYearKey(streak.startDate);
+        const endMonthYear = getMonthYearKey(streak.endDate);
+        uniqueMonths.add(startMonthYear);
+        uniqueMonths.add(endMonthYear);
+    });
+
+    input.rewardDates.forEach(reward => {
+        const rewardMonthYear = getMonthYearKey(reward.date);
+        uniqueMonths.add(rewardMonthYear);
+    });
+
+    uniqueMonths.forEach(monthYear => {
+        const [month, year] = monthYear.split("'");
+        const date = new Date(`20${year}-${month}-01`);
+        const daysInMonth = getDaysInMonth(date);
+        const daysArray = Array(daysInMonth).fill(0);
+        result[monthYear] = { days: daysArray };
+    });
+
+    input.loginStreaks.forEach(streak => {
+        const startDate = new Date(streak.startDate);
+        const endDate = new Date(streak.endDate);
+
+        while (startDate <= endDate) {
+            const monthYear = getMonthYearKey(startDate);
+            const dayIndex = startDate.getDate() - 1;
+            if (result[monthYear]) {
+                result[monthYear].days[dayIndex] = 1;
+            }
+            startDate.setDate(startDate.getDate() + 1);
+        }
+    });
+
+    const lastLoginDate = new Date(input.lastLogin);
+    const latestStreakEndDate = new Date(lastLoginDate);
+    const latestStreakStartDate = new Date(lastLoginDate);
+    latestStreakStartDate.setDate(latestStreakEndDate.getDate() - input.consecutiveLoginDays + 1);
+
+    while (latestStreakStartDate <= latestStreakEndDate) {
+        const monthYear = getMonthYearKey(latestStreakStartDate);
+        const dayIndex = latestStreakStartDate.getDate() - 1;
+        if (result[monthYear]) {
+            result[monthYear].days[dayIndex] = 1;
+        }
+        latestStreakStartDate.setDate(latestStreakStartDate.getDate() + 1);
+    }
+
+    input.rewardDates.forEach(reward => {
+        const rewardDate = new Date(reward.date);
+        const monthYear = getMonthYearKey(rewardDate);
+        const dayIndex = rewardDate.getDate() - 1;
+        if (result[monthYear]) {
+            result[monthYear].days[dayIndex] = reward.type;
+        }
+    });
+
+    return result;
+}
+
 // Update user visit and login
 
 router.get('/visit', authenticateToken, async (req, res) => {
@@ -31,9 +110,19 @@ router.get('/visit', authenticateToken, async (req, res) => {
         
             if (daysSinceLastLogin === 1) {
                 streak.consecutiveLoginDays++;
-                if (streak.consecutiveLoginDays % 10 === 0) {
-                    streak.rolls++; // Add rolls
+                if (streak.consecutiveLoginDays % 7 === 0) {
                     streak.trophies++;
+                    streak.rewardDates.push[{
+                        date: today,
+                        type: 2
+                    }];
+                }
+                if (streak.consecutiveLoginDays % 10 === 0) {
+                    streak.rolls++;
+                    streak.rewardDates.push[{
+                        date: today,
+                        type: 3
+                    }];
                 }
             } else {
                 streak.loginStreaks.push({
@@ -69,10 +158,15 @@ router.post('/useRoll', authenticateToken, async (req, res) => {
 
 router.get('/', authenticateToken, async (req, res) => {
     try {
-        let streak = await Streak.findOne({ _id: req.user._id });
-        // i am geting login streaks as object, so converting it to array
-        streak.loginStreaks = Object.values(streak.loginStreaks);
+        let result = await Streak.findOne({ _id: req.user._id });
+        let flattened =  await flattenStreakData(result)
+        streak = result.toObject();
+        delete streak['loginStreaks']; 
+        streak['data'] = flattened;
         res.status(200).json({ streak });
+
+        // streak.loginStreaks = Object.values(streak.loginStreaks);
+        // res.status(200).json({ streak });
 
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
@@ -82,7 +176,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
         // get top 5 users based on trophies
-        const top5 = await Streak.find().sort({ trophies: -1 }).limit(5);
+        const top5 = await Streak.find().sort({ trophies: -1, consecutiveLoginDays: -1, totalPoints: -1, name: 1 }).limit(5);
         // get current user rank based on trophies
         const user = await Streak.findOne({ _id: req.user._id });
         const currentRank = await Streak.find({ trophies: { $gt: user.trophies } }).countDocuments() + 1;
