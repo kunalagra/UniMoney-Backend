@@ -41,7 +41,7 @@ router.post('/add', authenticateToken, async (req, res) => {
         data.user = req.user._id;
         const transaction = await Transaction.create(data);
         // populate category field
-        await transaction.populate('category').execPopulate();
+        await transaction.populate('category')
         res.status(201).json(transaction);
 
     } catch (error) {
