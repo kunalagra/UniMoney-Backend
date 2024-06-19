@@ -175,11 +175,24 @@ router.get('/', authenticateToken, async (req, res) => {
 
 router.get('/leaderboard', authenticateToken, async (req, res) => {
     try {
-        // get top 5 users based on trophies
-        const top5 = await Streak.find().sort({ trophies: -1, consecutiveLoginDays: -1, totalPoints: -1, name: 1 }).limit(5);
+        // get top 5 users 
+        const top5 = await Streak.find().sort({ trophies: -1, consecutiveLoginDays: -1,  name: 1 }).limit(5);
         // get current user rank based on trophies
         const user = await Streak.findOne({ _id: req.user._id });
-        const currentRank = await Streak.find({ trophies: { $gt: user.trophies } }).countDocuments() + 1;
+        const currentRank = await Streak.find({
+            $or: [
+                { trophies: { $gt: user.trophies } },
+                {
+                    trophies: user.trophies,
+                    consecutiveLoginDays: { $gt: user.consecutiveLoginDays }
+                },
+                {
+                    trophies: user.trophies,
+                    consecutiveLoginDays: user.consecutiveLoginDays,
+                    name: { $lt: user.name }
+                }
+            ]
+        }).countDocuments() + 1;
         res.status(200).json({ top5, currentRank })
     } catch (err) {
         res.status(500).json({ error: 'Internal server error' });
