@@ -1,4 +1,9 @@
-process.loadEnvFile();
+try {
+    process.loadEnvFile();
+}
+catch (e) {
+    console.error(e)
+}
 const express = require("express");
 const cors = require("cors");
 const connectDB = require('./db');
@@ -13,14 +18,14 @@ const streak = require('./routes/streak');
 const reminder = require('./routes/reminder');
 
 
-app.use(express.json({limit: '25mb'}));
+app.use(express.json({ limit: '25mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 connectDB();
 
 app.use(cors());
 
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 app.use('/auth', auth);
 app.use('/category', category);
@@ -32,6 +37,6 @@ app.use('/reminder', reminder);
 
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
-    }
+}
 );
 
