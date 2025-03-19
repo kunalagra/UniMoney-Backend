@@ -1,6 +1,6 @@
+process.loadEnvFile();
 const express = require("express");
 const cors = require("cors");
-require('dotenv').config();
 const connectDB = require('./db');
 const app = express();
 const port = process.env.PORT || 3000;

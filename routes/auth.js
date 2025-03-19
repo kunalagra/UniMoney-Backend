@@ -9,7 +9,6 @@ const Category = require('../models/Category');
 const Streak = require('../models/Streak');
 const Reminder = require('../models/Reminder');
 const router = express.Router();
-require('dotenv').config();
 
 const defaultCategories = [
     {
